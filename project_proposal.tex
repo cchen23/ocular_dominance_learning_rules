@@ -1,0 +1,44 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{listings}
+
+\begin{document}
+ 
+\title{Project Proposal}
+\author{Cathy Chen (cc27)\\\textit{Advisor}: Dr. Zahra Aminzare\\ \textit{Reader}: Professor Naomi Leonard}
+\maketitle
+
+\section*{Overview and Background.}
+The cortex learns through synaptic plasticity, the process that adjusts weights connecting neurons in the brain. The brain develops networks of neural circuits that respond to stimuli from the world, and it does this without explicit instructions. Researchers have proposed various rules that model the dynamics of these neural systems as ordinary differential equations \cite{Dayan2000}.
+
+Neuroscience experiments provide information about learning in the visual cortex. They have shown that neurons in adult mammal primary visual cortices exhibit ocular dominance, in which neurons respond preferentially to input from one eye, and orientation selectivity, in which neurons respond preferentially to visual input of a certain orientation \cite{HubelWiesel1998}. In some mammals (such as cats) these neurons self-organize into cortical maps -- neurons near each other in cortex tend to have similar preferences. Researchers have hypothesized and simulated explanations for these phenomenon. For instance, competition for neurotrophic factors (molecules that promote synaptic plasticity) could cause columns of neurons with shared preferences, and recurrent connections between neurons could cause the geometry of cortical maps \cite{Harris1997}\cite{Galtier2011}.
+
+Furthermore, experiments in monocular deprivation (in which test animals do not receive visual input from one eye) give insight into visual learning. Monocular deprivation during a critical period damages neuron response to the deprived eye, but experimental evidence shows that reinstating binocular vision can cause neurons to recover their response to the deprived eye \cite{Feldman2009}\cite{Mitchell1977}.
+
+\section*{Proposed Project.}
+
+I propose to explore learning rules for synaptic plasticity. I will study the analytical justification for these rules and then create a simulate these rules in the visual cortex to see how well they model experimental phenomenon of ocular dominance and orientation selectivity. I plan to study the impact of changing parameters in the model. For instance, \cite{Harris1997} simulated the effect of different amounts of competition by varying the total amount of neurotrophic factors available to neurons. By modifying parameters in synaptic plasticity rules or the matrix that defines recurrent connections between neurons, I can better understand how these parameters affect cortical maps of neuron responses.
+
+After studying these models, I intend to study monocular deprivation and recovery by manipulating inputs. By providing inputs that simulate stimuli from a single eye, I can simulate periods of monocular deprivation and binocular reinstatement. By changing the amount of learning before and after periods of simulated deprivation, I can simulate monocular deprivation across different timescales and time periods. Existing experimental evidence with rats and kittens show that monocular deprivation during a critical period affects the ocular dominance preferences learned by cortical neurons, and that removing monocular deprivation can help kittens recover binocular response \cite{Feldman2009}\cite{Mitchell1977}. Simulating monocular deprivation would test the ability of these learning rules to model effects observed in real animals, and could also give a better understanding of the critical period observed in biological experiments. 
+
+\section*{Timeline.}
+This is a rough timeline of my plan.
+
+From November to December, I plan to conduct a literature review of existing learning rules and experimental evidence. During this period, I will study the analytical justification for these rules and findings from experimental manipulations such as injecting trophic factors or imposing monocular deprivation.
+
+From December to January, I plan to implement computational models based on these rules and simulate neural visual learning and self-organization into cortical maps.
+
+From January to February, I plan to manipulate the model's parameters to mirror manipulations in biological experiments, and to compare the model's impacts to those found in biological experiments.
+
+In mid-January, I will present intermediate results in the MAT323 course.
+
+From February to March, I plan to simulate and study periods of monocular deprivation and to compare these effects to those of biological experiments as well.
+
+In April, I will consolidate my results and submit a written and oral presentation of the project.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
+ 
