@@ -11,3 +11,9 @@ MAT323/PACM Project Timeline.
 - [ ] Writeup.
 - [ ] Presentation.
 
+
+Resources:
+Exercise: BCM rule: http://www.inf.ed.ac.uk/teaching/courses/nc/2010-2011/asst2.pdf
+Simulator: Topographica: http://ioam.github.io/topographica/User_Manual/introduction.html
+    Code: https://github.com/ioam/topographica
+Neural data modeling blog: http://www.mjrlab.org/tag/matlab/
