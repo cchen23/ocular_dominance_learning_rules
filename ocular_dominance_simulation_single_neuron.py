@@ -118,13 +118,13 @@ def run_simulation_many_trials(update_function, update_name, nonnegative_weights
 
 # TODO: When to enforce nonnegative weights?
 if __name__ == "__main__":
-    #run_simulation_many_trials(utils.basic_hebb_update, "Basic Hebb")
-    #run_simulation_many_trials(utils.subtractive_normalization_update, "Subtractive Normalization")
-    #run_simulation_many_trials(utils.oja_update, "Oja", nonnegative_weights=False)
+    run_simulation_many_trials(utils.basic_hebb_update, "Basic Hebb")
+    run_simulation_many_trials(utils.subtractive_normalization_update, "Subtractive Normalization")
+    run_simulation_many_trials(utils.oja_update, "Oja", nonnegative_weights=False)
     
-    #run_simulation_trajectory(utils.basic_hebb_update, "Basic Hebb")
-    #run_simulation_trajectory(utils.subtractive_normalization_update, "Subtractive Normalization")
-    #run_simulation_trajectory(utils.oja_update, "Oja", nonnegative_weights=False)
+    run_simulation_trajectory(utils.basic_hebb_update, "Basic Hebb")
+    run_simulation_trajectory(utils.subtractive_normalization_update, "Subtractive Normalization")
+    run_simulation_trajectory(utils.oja_update, "Oja", nonnegative_weights=False)
     
     run_simulation_trajectory_average(utils.basic_hebb_averaged_update, "Basic Hebb")
     run_simulation_many_trials_average(utils.basic_hebb_averaged_update, "Basic Hebb")

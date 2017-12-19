@@ -12,14 +12,14 @@ import plasticity_simulations_utils as utils
 # TODO: Put into jupyter notebook to make experimentation easier.
 def recurrent_connections_simulation_averaged(update_function, update_name):
     num_neurons = 500
-    num_timesteps = 100
+    num_timesteps = 1000
     num_inputs = 2
     learning_rate = 0.1
     weights = np.random.rand(num_neurons, num_inputs)
     
     Q = utils.generate_Q(num_inputs, num_timesteps)
-    #K = utils.create_K(num_neurons)
-    K = utils.create_K_Gaussian(num_neurons)
+    K = utils.create_K(num_neurons)
+    #K = utils.create_K_Gaussian(num_neurons)
     for timestep in range(num_timesteps):
         weights = update_function(weights, learning_rate, Q, K)
     
@@ -29,7 +29,7 @@ def recurrent_connections_simulation_averaged(update_function, update_name):
     plt.imshow(np.transpose(weights_diff[:50,:]), cmap="gray")
     
 def recurrent_connections_simulation(update_function, update_name):
-    num_neurons = 500
+    num_neurons = 100
     num_timesteps = 100
     num_inputs = 2
     learning_rate = 0.1
@@ -49,4 +49,5 @@ def recurrent_connections_simulation(update_function, update_name):
 if __name__ == "__main__":
     #recurrent_connections_simulation_averaged(utils.basic_hebb_averaged_update, "Basic Hebb")
     #recurrent_connections_simulation(utils.basic_hebb_update, "Basic Hebb")
-    recurrent_connections_simulation(utils.subtractive_normalization_update_multiple, "Subtractive Normalization")
+    #recurrent_connections_simulation(utils.subtractive_normalization_update_multiple, "Subtractive Normalization")
+    recurrent_connections_simulation(utils.competitive_hebb_update, "Competitive Hebb")
