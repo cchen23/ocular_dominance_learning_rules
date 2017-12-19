@@ -41,6 +41,24 @@ def create_K(num_neurons):
             K[i,j] = np.exp(-(delta**2)/(2*sigma**2))-(1/9)*np.exp(-(delta**2)/(18*sigma**2))
     return K
 
+def index_to_location(index, num_rows):
+    row = index / num_rows
+    col = index % num_rows
+    return row, col
+
+def create_K_2D(num_rows, num_cols):
+    # Sigma value from http://www.gatsby.ucl.ac.uk/~dayan/book/exercises/c8/c8.pdf
+    num_neurons = num_rows * num_cols
+    K = np.empty((num_neurons, num_neurons))
+    sigma = 0.66
+    for i in range(num_neurons):
+        for j in range(num_neurons):
+            row_i, col_i = index_to_location(i, num_rows)
+            row_j, col_j = index_to_location(j, num_rows)
+            delta = np.abs(row_i-row_j) + np.abs(col_i-col_j)
+            K[i,j] = np.exp(-(delta**2)/(2*sigma**2))-(1/9)*np.exp(-(delta**2)/(18*sigma**2))
+    return K
+ 
 # TODO: investigate effect of different sigmas.
 def create_K_Gaussian(num_neurons):
     K = np.empty((num_neurons, num_neurons))
@@ -73,10 +91,11 @@ def compute_activation(weights, current_input, K):
         activation[activation < 0] = 0
     return activation
 
-def compute_activation_competitive_hebb(weights, current_input, M):
-    delta = 5
+def compute_activation_competitive_hebb(weights, current_input, K):
+    delta = 2
     num_neurons = weights.shape[0]
     M = create_M(num_neurons)
+    #M = np.eye(num_neurons) - np.linalg.pinv(K)
     numerator = np.power(np.dot(weights, current_input), delta)
     z_a = numerator / np.sum(numerator)
     activation = np.dot(M, z_a)
@@ -118,7 +137,7 @@ def subtractive_normalization_update_multiple(weights, current_input, learning_r
     delta = np.dot(activation, np.reshape(current_input, (1, 2))) - activation * np.dot(n, current_input) * n / n_u
     return weights + learning_rate * delta
 
-def competitive_hebb_update(weights, current_input, learning_rate, M):
-    activation = compute_activation_competitive_hebb(weights, current_input, M)
+def competitive_hebb_update(weights, current_input, learning_rate, K):
+    activation = compute_activation_competitive_hebb(weights, current_input, K)
     current_input = np.reshape(current_input, (1, current_input.shape[0]))
     return weights + learning_rate * np.dot(activation, current_input)

@@ -46,8 +46,28 @@ def recurrent_connections_simulation(update_function, update_name):
     plt.title("Ocular Dominance Map, %s Update" % update_name)
     plt.imshow(np.transpose(weights_diff[:50,:]), cmap="gray")
     
+def recurrent_connections_simulation_averaged_2D(update_function, update_name):
+    num_neurons = 500
+    num_timesteps = 1000
+    num_inputs = 2
+    learning_rate = 0.1
+    weights = np.random.rand(num_neurons, num_inputs)
+    num_rows = 10
+    num_cols = 50
+    
+    Q = utils.generate_Q(num_inputs, num_timesteps)
+    K = utils.create_K_2D(num_rows, num_cols)
+    for timestep in range(num_timesteps):
+        weights = update_function(weights, learning_rate, Q, K)
+    
+    weights_diff = np.reshape(weights[:,0] - weights[:,1], (num_neurons, 1))
+    plt.figure()
+    plt.title("Averaged Ocular Dominance Map, %s Update" % update_name)
+    plt.imshow(np.reshape(weights_diff, (num_rows, num_cols)), cmap="gray")
+
 if __name__ == "__main__":
-    #recurrent_connections_simulation_averaged(utils.basic_hebb_averaged_update, "Basic Hebb")
+    recurrent_connections_simulation_averaged(utils.basic_hebb_averaged_update, "Basic Hebb")
     #recurrent_connections_simulation(utils.basic_hebb_update, "Basic Hebb")
     #recurrent_connections_simulation(utils.subtractive_normalization_update_multiple, "Subtractive Normalization")
-    recurrent_connections_simulation(utils.competitive_hebb_update, "Competitive Hebb")
+    #recurrent_connections_simulation(utils.competitive_hebb_update, "Competitive Hebb")
+    #recurrent_connections_simulation_averaged_2D(utils.basic_hebb_averaged_update, "Basic Hebb")
