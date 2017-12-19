@@ -82,6 +82,12 @@ def create_M(num_neurons):
             M[i,j] = connection_e - connection_i
     return M
 
+def eliminate_edge_effects(activation):
+    activation_edge = (activation[0] + activation[-1]) / 2 # Eliminate edge effects
+    activation[0] = activation_edge
+    activation[-1] = activation_edge
+    return activation
+
 def compute_activation(weights, current_input, K):
     if K is None:
         activation = np.dot(weights, current_input)
@@ -89,16 +95,18 @@ def compute_activation(weights, current_input, K):
     else:
         activation = np.reshape(np.dot(K, np.dot(weights, current_input)), (K.shape[0], 1))
         activation[activation < 0] = 0
+        activation = eliminate_edge_effects(activation)
     return activation
 
 def compute_activation_competitive_hebb(weights, current_input, K):
     delta = 2
     num_neurons = weights.shape[0]
     M = create_M(num_neurons)
-    #M = np.eye(num_neurons) - np.linalg.pinv(K)
+    #M = np.eye(num_neurons) - np.linalg.pinv(K) # Alternate computation of M.
     numerator = np.power(np.dot(weights, current_input), delta)
     z_a = numerator / np.sum(numerator)
     activation = np.dot(M, z_a)
+    activation = eliminate_edge_effects(activation)
     return np.expand_dims(activation, axis=1)
 
 # Update rules.
