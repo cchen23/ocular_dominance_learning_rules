@@ -143,7 +143,7 @@ The goal of this project is to model ocular dominance using unsupervised learnin
 
 This project builds upon the work of previous researchers who have designed the various learning rules implemented in this project. By experimenting with model parameters, we hope to gain insight into possible biological implementations of ocular dominance maps. 
 
-Furthermore, during background research we felt a lack of open-source, easily modifiable implementations of these ocular dominance models. There in addition to analyzing various models and parameters, this project involved implementing the models from scratch in a format designed to allow easy experimentation. The appendix (\ref{sec:Appendix}) contains more details about this component of the project.
+Furthermore, wanted to create easily modifiable implementations of these ocular dominance models. Therefore in addition to analyzing various models and parameters, this project involved implementing the models from scratch in a format designed to allow easy experimentation. The appendix (\ref{sec:Appendix}) contains more details about this component of the project.
 
 \section{Methods}
 We model ocular dominance in single neurons as well as cortical maps of ocular dominance in networks of multiple neurons in the same layer. In all our simulations, we use a learning rate of $0.1$, which corresponds to $tau_w=10$.
@@ -185,9 +185,144 @@ Third, we test a model that follows the "Mexican-hat" model (approximated by a d
 
 \section{Results and Discussion}
 \subsection{Ocular Dominance in a Single Neuron}
+Here, we show the trajectories of left and right eye weight development for a single trial. We also show final weights learned after $10$ trials, where we randomly initialize the weights at the beginning of each trial.
+
+\subsubsection{Basic Hebb}
+With basic Hebbian learning, we see that both weights grow arbitrarily large~(\ref{fig:hebb}). Furthermore, we observe that the approximation we describe in $(2.1.1)$ exhibits the same behavior as the original learning rule.
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/trajectories_basichebb}
+\includegraphics[scale=0.5]{../figures/trials_basichebb}
+\includegraphics[scale=0.5]{../figures/trajectories_average_basichebb}
+\includegraphics[scale=0.5]{../figures/trials_average_basichebb}
+\caption{Basic Hebb}
+\label{fig:hebb}
+\end{figure}
+
+\subsubsection{Oja's Rule}
+With Oja's rule, rather than weights growing indefinitely large, we observe that the weight magnitudes display competition. When both weights have large magnitudes, the system moves towards reducing the weights, and the weights eventually stabilize rather than continuing to grow in magnitude~(\ref{fig:oja}).
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/trajectories_oja}
+\includegraphics[scale=0.5]{../figures/trials_oja}
+\caption{Oja's Rule}
+\label{fig:oja}
+\end{figure}
+
+\subsubsection{Subtractive Normalization}
+With subtractive normalization, we similarly see competition between weight magnitudes, in that a high value in one weight tends to correspond to a low value in the other weight~(\ref{fig:subtractivenormalization}). In these simulations, we see ocular dominance start to emerge, where the final weights display near-zero values for one eye and a relatively higher weight for the other~(\ref{fig:subtractivenormalization}).
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/trajectories_subtractivenormalization}
+\includegraphics[scale=0.5]{../figures/trials_subtractivenormalization}
+\caption{Subtractive Normalization}
+\label{fig:subtractivenormalization}
+\end{figure}
+
 \subsection{Cortical Maps of Ocular Dominance}
-% parameters
-% 2D maps
+In each simulation, we show the differences between weights to the left eye and to the right eye of $50$ neurons in the simulation (in the simulated system, there are a total of $500$ neurons).
+
+\subsubsection{Gaussian $\mathbf{K}$}
+With a Gaussian $\mathbf{K}$, we observe that very small values of $\sigma$ lead to maps with more changes of ocular dominance preferences, and large values of $\sigma$ lead to map with more changes between ocular dominance preferences~(\ref{fig:map_gaussian_averagedhebb},\ref{fig:map_gaussian_hebb},\ref{fig:map_gaussian_subtractivenormalization}). By looking at the forms of Gaussian functions with different $\sigma$s, we observe that functions with smaller $\sigma$s correspond to recurrent connections that are more concentrated to a particular neuron's nearer neighbors~(\ref{fig:demo_gaussians}).
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/map_averaged_basichebb_gaussian_sigma01}
+\includegraphics[scale=0.5]{../figures/map_averaged_basichebb_gaussian_sigma03}
+\includegraphics[scale=0.5]{../figures/map_averaged_basichebb_gaussian_sigma05}
+\caption{Ocular Dominance Map, Gaussian $\mathbf{K}$, Averaged Basic Hebb}
+\label{fig:map_gaussian_averagedhebb}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/map_basichebb_gaussian_sigma01}
+\includegraphics[scale=0.5]{../figures/map_basichebb_gaussian_sigma03}
+\includegraphics[scale=0.5]{../figures/map_basichebb_gaussian_sigma05}
+\caption{Ocular Dominance Map, Gaussian $\mathbf{K}$, Basic Hebb}
+\label{fig:map_gaussian_hebb}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/map_subtractivenormalization_gaussian_sigma01}
+\includegraphics[scale=0.5]{../figures/map_subtractivenormalization_gaussian_sigma03}
+\includegraphics[scale=0.5]{../figures/map_subtractivenormalization_gaussian_sigma05}
+\caption{Ocular Dominance Map, Gaussian $\mathbf{K}$, Subtractive Normalization}
+\label{fig:map_gaussian_subtractivenormalization}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{../figures/demo_gaussians}
+\caption{Gaussian functions with different $\sigma$}
+\label{fig:demo_gaussians}
+\end{figure}
+
+\subsubsection{Difference of Gaussians $\mathbf{K}$}
+We see a similar pattern with the $\mathbf{K}$ that takes the form of a difference of Gaussians~(\ref{fig:map_differencegaussians_averagedhebb},\ref{fig:map_differencegaussians_hebb},\ref{fig:map_differencegaussians_subtractivenormalization}).. In these simulations, when we have $\sigma=0.1$, the resulting neural preferences fail to show the orderly pattern of preferences that appear in cortical maps of ocular dominance. At the other end, when we have $\sigma=2$, the resulting neural preferences form a pattern that is dominated by few shifts in ocular dominance. We observe that this follows from the forms of the difference of Gaussians functions (as described in $(17)$), which we show in~(\ref{fig:demo_differencegaussians}).
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/map_averaged_basichebb_differencegaussians_sigma01}
+\includegraphics[scale=0.5]{../figures/map_averaged_basichebb_differencegaussians_sigma05}
+\includegraphics[scale=0.5]{../figures/map_averaged_basichebb_differencegaussians_sigma2}
+\caption{Ocular Dominance Map, Difference of Gaussians $\mathbf{K}$, Averaged Basic Hebb}
+\label{fig:map_differencegaussians_averagedhebb}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/map_basichebb_differencegaussians_sigma01}
+\includegraphics[scale=0.5]{../figures/map_basichebb_differencegaussians_sigma05}
+\includegraphics[scale=0.5]{../figures/map_basichebb_differencegaussians_sigma2}
+\caption{Ocular Dominance Map, Difference of Gaussians $\mathbf{K}$, Basic Hebb}
+\label{fig:map_differencegaussians_hebb}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/map_subtractivenormalization_differencegaussians_sigma01}
+\includegraphics[scale=0.5]{../figures/map_subtractivenormalization_differencegaussians_sigma05}
+\includegraphics[scale=0.5]{../figures/map_subtractivenormalization_differencegaussians_sigma2}
+\caption{Ocular Dominance Map, Difference of Gaussians $\mathbf{K}$, Subtractive Normalization}
+\label{fig:map_differencegaussians_subtractivenormalization}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{../figures/demo_differencegaussians}
+\caption{Difference of Gaussians function with different $\sigma$}
+\label{fig:demo_differencegaussians}
+\end{figure}
+
+\subsubsection{Competitive Hebbian Learning}
+In our simulations with competitive Hebbian learning, we observe less distinct patterns of ocular dominance preferences~(\ref{fig:map_competitivehebb},\ref{fig:map_competitivehebb}). We were able to find parameters for the matrix of recurrent connections $\mathbf{M}$ that result in networks that resemble cortical maps of ocular dominance, but these maps are much less clear than the ones in the preceding sections.
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/map_competitivehebb_sigmae5_sigmai10_delta1}
+\includegraphics[scale=0.5]{../figures/map_competitivehebb_sigmae10_sigmai15_delta1}
+\includegraphics[scale=0.5]{../figures/map_competitivehebb_sigmae10_sigmai20_delta1}
+\caption{Ocular Dominance Map, Competitive Hebbian Learning, $\delta=1$}
+\label{fig:map_competitivehebb}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{../figures/map_competitivehebb_sigmae5_sigmai10_delta10}
+\includegraphics[scale=0.5]{../figures/map_competitivehebb_sigmae10_sigmai15_delta10}
+\includegraphics[scale=0.5]{../figures/map_competitivehebb_sigmae10_sigmai20_delta10}
+\caption{Ocular Dominance Map, Competitive Hebbian Learning, $\delta=10$}
+\label{fig:map_competitivehebb_delta10}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{../figures/demo_mexicanhat}
+\caption{"Mexican-hat" $\mathbf{M}$ functions with different $\sigma_E$ and $\sigma_I$}
+\label{fig:demo_mexicanhat}
+\end{figure}
+
+\subsubsection{2D Cortical Map}
+Since neurons in the brain form cortical maps in more than one direction, we also simulate a 2D cortical map of ocular dominance, using a $\mathbf{K}$ that takes the form of a 2D Difference of Gaussians. We find that this forms a 2D cortical map of ocular dominance similarly displays neuron preferences organized into a cortical map~(\ref{fig:map_2d}).
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{../figures/map_2d_basichebb_differencegaussians}
+\caption{Ocular Dominance Map in 2D, Difference of Gaussians with Averaged Basic Hebb Updates}
+\label{fig:map_2d}
+\end{figure}
 
 \section{Future Work}
 In the future, we plan to build upon these simulations to mimic biological experiments of ocular dominance. Specifically, we will perform manipulations to mirror experiments of neurotrophic factors and monocular deprivation.
@@ -198,9 +333,11 @@ Researchers have found that applying neurotrophic factors to neural systems prev
 Furthermore, we will study monocular deprivation and recovery. Experimenters have shown that monocular deprivation during a critical period hinders the development of ocular dominance preferences in kittens and rats, and that later binocular reinstatement sometimes allows the animals to recover ocular dominance responses to both eyes~\cite{feldman_synaptic_2009}\cite{mitchell_recovery_1977}. By manipulating the inputs used in this project's simulations, we will mimic monocular deprivation during ocular dominance development. With these manipulations, we plan to find a "critical period" in our model that mirrors that of biological systems, and to test the situations in which ocular dominance maps can be reinstated.
 
 \bibliographystyle{plain}
-\bibliography{mat323}
+\bibliography{mat323bibtex}
+% Fix years and journal names
 
 \section{Appendix}\label{sec:Appendix}
-% ALSO JUPYTER NOTEBOOKS?
+The code used to create the simulations described in the previous sections is available \href{https://github.com/cchen23/ocular_dominance_learning_rules}{online}. The code is designed to allow modular definitions of learning rules, recurrent connections, and inputs that can be substituted into the main simulation framework.
+
 \end{document}
  
