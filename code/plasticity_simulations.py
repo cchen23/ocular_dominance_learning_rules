@@ -64,4 +64,4 @@ def oja_simulation(nonnegative_weights):
         
 if __name__ == "__main__":
     nonnegative_weights = True
-    basic_hebb_simulation(nonnegative_weights)
+    covariance_simulation(nonnegative_weights)

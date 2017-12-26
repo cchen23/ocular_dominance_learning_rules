@@ -1,0 +1,206 @@
+\documentclass[pageno]{mat323paper}
+
+\newcommand{\quotes}[1]{``#1''}
+
+\widowpenalty=9999
+
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{algorithm2e}
+\usepackage{subfig}
+
+\begin{document}
+
+\title{Simulating Ocular Dominance with Unsupervised Learning Rules}
+
+\author{Cathy Chen\\Instructor: Dr. Zahra Aminzare}
+\date{}
+\maketitle
+	
+\section{Background}
+\subsection{Biological Systems}
+The visual system transmits information about stimuli perceived by the eyes through networks of neurons. These networks transfer signals from the photoreceptors that capture light to the neurons in visual cortex that further process these signals~\cite{wolfe_sensation_2014}. Some neurons, such as those in layer 4 of the human primary visual cortex (V1), display ocular dominance by responding preferentially to inputs from a certain eye~\cite{miller_receptive_1996}. Some animals (such as cats and monkeys) have cortical maps composed of ocular dominance columns, in which alternating columns of neurons in the visual cortex respond preferentially to inputs from the same eye.
+
+\subsection{Unsupervised Learning}
+These cortical maps emerge through self-organization rather than some externally imposed structure. Unsupervised learning allows a network to learn from inputs based on internal rules. In contrast to supervised learning, which requires labels provided by an external "teacher", unsupervised learning does not involve external labels~\cite{dayan_theoretical_2000}. As such, we use unsupervised learning rules to model the development of ocular dominance maps in the visual cortex.
+
+\section{Related Work}
+\subsection{Learning Rules}
+Researchers have devised a number of unsupervised learning rules to model preferential neural responses, and here we give a brief overview of these rules used in our simulations and their characteristics. This subsection and the next are largely taken from~\cite{dayan_theoretical_2000}.
+
+We model a neuron's firing rate as a weighted combination of its inputs. The weights correspond to synapses between neurons, and the inputs correspond to activations of neurons that synapse onto the modeled neuron. For a given input vector $\mathbf{u}$ and weight vector $\mathbf{w}$, the neuron's firing rate $v$ changes according to
+\begin{align}
+\tau_r\frac{dv}{dt}=-v+\mathbf{w}\cdot\mathbf{u}
+\end{align}
+
+In our simulations, we assume that the firing rate reaches its steady state (we justify this assumption by noting that biological synaptic plasticity occurs much more slowly than firing rate dynamics), so we directly take the firing rate $v$ as 
+\begin{align}
+v=\mathbf{w}\cdot\mathbf{u}
+\end{align}.
+
+To mimic biological systems, we constrain the neural activity $v$ to non-negative values.
+
+In our simulations, we model the learning of the weights $\mathbf{w}$ using the following learning rules:
+
+\subsubsection{Basic Hebbian Learning}
+This learning rule follows Hebb's "fire together, wire together" rule, which states that synapses strengthen between neurons that tend to activate together. This rule takes the form
+\begin{align}
+\tau_w\frac{d\mathbf{w}}{dt}=v\mathbf{u}
+\end{align}
+
+Using our assumption in $(2)$, we approximate this rule as
+\begin{align}
+\tau_w\frac{d\mathbf{w}}{dt}=(\mathbf{w}\cdot\mathbf{u})\mathbf{u}
+\end{align}
+
+As an alternative to separately computing the affect of each input pattern $\mathbf{u}$, we can approximate Hebbian learning by computing the average affect of all the input patterns presented to the neuron. Then we substitute $(3)$ with $\tau_w\frac{d\mathbf{w}}{dt}=<(\mathbf{w}\cdot\mathbf{u})\mathbf{u}>$. We let $\mathbf{Q}=<\mathbf{u}\mathbf{u}>$, and write the averaged Hebbian learning rule as
+\begin{align}
+\tau_w\frac{d\mathbf{w}}{dt}=\mathbf{Q}\cdot\mathbf{w}
+\end{align}
+
+In this form, Hebbian learning causes the magnitude of the weight vector $\mathbf{w}$ to constantly grow, producing weight vectors that become arbitrarily large:
+\begin{align*}
+\tau_w\frac{d|\mathbf{w}|^2}{dt}=2\mathbf{w}\cdot\frac{d\mathbf{w}}{dt}\\
+=2\mathbf{w}\cdot(\mathbf{w}\cdot\mathbf{u})\mathbf{u}\\
+=2(\mathbf{w}\cdot\mathbf{u})^2\\
+\geq0
+\end{align*}
+
+\subsubsection{Synaptic Normalization}
+To prevent weights that become arbitrarily large in magnitude, we can impose weight normalization in our model. Biologically, this corresponds to competition between synaptic weights.
+
+\subsubsection*{Subtractive Normalization}
+In this model, we normalize synaptic weights by setting a hard constraint on the sum of the weights. (In this model, we constrain weights to non-negative values). This rule takes the form
+\begin{align}
+\tau_w\frac{d\mathbf{w}}{dt}=v\mathbf{u}-\frac{v(\mathbf{n}\cdot\mathbf{u})\mathbf{n}}{N_u}
+\end{align}
+where $\mathbf{n}$ is a vector of ones and $N_u$ is the length of the input vector $\mathbf{u}$.
+
+In this model, the sum of weights $\mathbf{n}\cdot\mathbf{w}$ remains fixed:
+\begin{align*}
+\tau_w\frac{d(\mathbf{n}\cdot\mathbf{w})}{dt}=\mathbf{n}\cdot(v\mathbf{u}-\frac{v(\mathbf{n}\cdot\mathbf{u})\mathbf{n}}{N_u})\\
+=\mathbf{n}\cdot v\mathbf{u}-\frac{\mathbf{n}\cdot v(\mathbf{n}\cdot\mathbf{u})\mathbf{n}}{N_u})\\
+=v\mathbf{n}\cdot\mathbf{u}(1-\frac{\mathbf{n}\cdot\mathbf{n}}{N_u})\\
+=v\mathbf{n}\cdot\mathbf{u}(1-\frac{N_u}{N_u})\\
+=v\mathbf{n}\cdot\mathbf{u}(1-1)\\
+0
+\end{align*}
+
+\subsubsection*{Oja's Rule}
+We can also impose synaptic normalization locally. In this model, we update weights according to
+\begin{align}
+\tau_w\frac{d\mathbf{w}}{dt}=v\mathbf{u}-\alpha v^2\mathbf{w}
+\end{align}
+where $\alpha>0$.
+
+In this form, the weights compete with each other and stabilize over time:
+\begin{align*}
+\tau_w\frac{d|\mathbf{w}|^2}{dt}=2\mathbf{w}\cdot\frac{d\mathbf{w}}{dt}\\
+=2\mathbf{w}\cdot(v\mathbf{u}-\alpha v^2\mathbf{w})\\
+=2\mathbf{w}\cdot(\mathbf{w}\cdot\mathbf{u})\mathbf{u}-2\mathbf{w}\alpha v^2\mathbf{w})\\
+=2v^2-2\alpha v^2\mathbf{w}^2)\\
+=2v^2(1-\alpha\mathbf{w}^2)
+\end{align*}
+which has a steady state at $\mathbf{w}^2=\frac{1}{\alpha}$
+
+\subsection{Cortical Maps}
+To simulate cortical maps composed of many neurons, we add recurrent connections between the postsynaptic neurons in our model. These connections induce competition between neural activity, which helps prevent the neurons from developing the same responses to presynaptic input. This is important because it allows the neurons to develop different response preferences.
+
+To simulate these connections, we add recurrent connections to the neural activity dynamics, which becomes
+\begin{align}
+\tau_r\frac{d\mathbf{v}}{dt}=-\mathbf{v}+\mathbf{W}\cdot\mathbf{u}+\mathbf{M}\cdot\mathbf{v}
+\end{align}
+where $\mathbf{M}$ describes the recurrent connections between postsynaptic neurons.
+
+In this case, our approximation of $\mathbf{v}$ becomes
+\begin{align}
+\mathbf{v}=\mathbf{W}\cdot\mathbf{u}+\mathbf{M}\cdot\mathbf{v}
+\end{align}
+
+If $(\mathbf{I}-\mathbf{M})^{-1}$ is invertible, then we can define $\mathbf{K}=(\mathbf{I}-\mathbf{M})^{-1}$ and write $\mathbf{v}$ as
+\begin{align}
+\mathbf{v}=\mathbf{K}\cdot\mathbf{W}\cdot\mathbf{u}
+\end{align}
+
+Upon defining $\mathbf{v}$, we can apply the learning rules from $(2.1)$ to simulate the development of cortical maps.
+
+\subsubsection{Competitive Hebbian Learning}
+To strengthen competition between postsynaptic neurons, we can use nonlinear recurrent connections. For instance, the competitive Hebbian learning model uses nonlinear competition to implement long-range inhibition and short-range excitation. This model promotes similar response preferences between neurons that are closer together, and competition (which induces different response preferences) between neurons that are farther apart.
+
+In this model, we model activation as follows:
+\begin{align}
+\mathbf{z}=\frac{(\mathbf{W}\cdot\mathbf{u})^\delta}{(\mathbf{1}^\top\cdot\mathbf{W}\cdot\mathbf{u})^\delta}\\
+\mathbf{v}=\mathbf{M}\mathbf{z}
+\end{align}
+
+\subsection{Existing Simulations}
+Currently, there exist open-source projects to create larger-scale simulations of topographic maps in the brain. For instance, the software package Topographica allows multiple layers of large networks of neurons~\cite{bednar_topographica_2009}.
+
+Furthermore, researchers have investigated various learning rules for ocular dominance. For instance,~\cite{erwin_models_1995} surveyed pattern-based and developmental models of ocular dominance and compared the results to experimental data from macaque monkeys. Others, such as~\cite{miller_ocular_1989} have proposed and simulated specific mathematical models of ocular dominance.
+
+\section{Motivation and Goals}
+The goal of this project is to model ocular dominance using unsupervised learning rules and to analyze changes to these models. We simulate ocular dominance in single neurons as well as cortical maps of ocular dominance, and experiment with various learning rules and parameters.
+
+This project builds upon the work of previous researchers who have designed the various learning rules implemented in this project. By experimenting with model parameters, we hope to gain insight into possible biological implementations of ocular dominance maps. 
+
+Furthermore, during background research we felt a lack of open-source, easily modifiable implementations of these ocular dominance models. There in addition to analyzing various models and parameters, this project involved implementing the models from scratch in a format designed to allow easy experimentation. The appendix (\ref{sec:Appendix}) contains more details about this component of the project.
+
+\section{Methods}
+We model ocular dominance in single neurons as well as cortical maps of ocular dominance in networks of multiple neurons in the same layer. In all our simulations, we use a learning rate of $0.1$, which corresponds to $tau_w=10$.
+
+\subsection{Ocular Dominance in a Single Neuron}
+We model ocular dominance in single neurons; that is, we model the tendency of single neurons to develop a preferential response to inputs from a certain eye.
+
+We model inputs from the left and right eye as a $2\times1$ vector of correlated random inputs. The eyes' input are generated according to
+\begin{align}
+u_l=x+0.5\sigma_l\\
+u_r=x+0.5\sigma_r
+\end{align}
+where $x$, $\sigma_l$, and $\sigma_r$ are uniform random variables between $0$ and $1$. We use this scheme to generate inputs to approximate the real-world tendency for both eyes to receive correlated, but slightly different, stimuli. % Talk about/test what happens if not correlated?
+
+We then implement each of the learning rules described in $(2.1)$ and simulate the response preferences that develop in single neurons.
+
+\subsection{Cortical Map of Ocular Dominance}
+We then model the development of cortical maps of ocular dominance using systems of recurrently connected neurons.
+
+We simulate a system with $500$ neurons, and experiment with three models of recurrent connections.
+
+First, we test a model in which the recurrent connections between two neurons follow a Gaussian distribution. More specifically, we use
+\begin{align}
+K[i,j]=\frac{1}{\sigma\sqrt{2\pi}}\exp{\frac{-1}{2}(\frac{|i-j|}{\sigma})^2}\\
+\includegraphics[scale=0.5]{../figures/K_gaussian_sigma04}
+\end{align}
+
+Second, we test a model in which $\mathbf{K}$ is a difference of Gaussians, as described in~\cite{dayan_theoretical_2000}. We implement this as
+\begin{align}
+K[i,j]=\exp{\frac{-(i-j)^2}{2\sigma^2}}-\frac{1}{9}\exp{\frac{-(i-j)^2}{18\sigma^2}}\\
+\includegraphics[scale=0.5]{../figures/K_difference_gaussian_sigma066}
+\end{align}
+
+Third, we test a model that follows the "Mexican-hat" model (approximated by a difference of Gaussians with different $\sigma$ for excitatory and inhibitory contributions) described in~\cite{toyoizumi_equalization_2009}. We implement this as 
+\begin{align}
+\frac{1}{\sigma_E\sqrt{2\pi}}\exp{\frac{(i-j)^2}{2\sigma_E^2}}+\frac{1}{\sigma_I\sqrt{2\pi}}\exp{\frac{(i-j)^2}{2\sigma_I^2}}\\
+\includegraphics[scale=0.5]{../figures/M_sigma00502}
+\end{align}
+
+\section{Results and Discussion}
+\subsection{Ocular Dominance in a Single Neuron}
+\subsection{Cortical Maps of Ocular Dominance}
+% parameters
+% 2D maps
+
+\section{Future Work}
+In the future, we plan to build upon these simulations to mimic biological experiments of ocular dominance. Specifically, we will perform manipulations to mirror experiments of neurotrophic factors and monocular deprivation.
+
+% POSSIBLE TODO: MOVE THIS TO CURRENT WRITEUP.
+Researchers have found that applying neurotrophic factors to neural systems prevent the development of cortical maps of ocular dominance, and have interpreted this as resulting from a lack of competition between neurons~\cite{harris_model_1997}. By experimenting with the recurrent connections used in this project's simulation, we will mimic a reduction in competition due to neurotrophic factors and investigate the effect of this manipulation on the formation of cortical maps of ocular dominance.
+
+Furthermore, we will study monocular deprivation and recovery. Experimenters have shown that monocular deprivation during a critical period hinders the development of ocular dominance preferences in kittens and rats, and that later binocular reinstatement sometimes allows the animals to recover ocular dominance responses to both eyes~\cite{feldman_synaptic_2009}\cite{mitchell_recovery_1977}. By manipulating the inputs used in this project's simulations, we will mimic monocular deprivation during ocular dominance development. With these manipulations, we plan to find a "critical period" in our model that mirrors that of biological systems, and to test the situations in which ocular dominance maps can be reinstated.
+
+\bibliographystyle{plain}
+\bibliography{mat323}
+
+\section{Appendix}\label{sec:Appendix}
+% ALSO JUPYTER NOTEBOOKS?
+\end{document}
+ 

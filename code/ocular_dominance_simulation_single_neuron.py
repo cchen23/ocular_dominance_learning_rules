@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Dec 17 14:28:11 2017
+Ocular dominance simulations in a single neuron.
 
 @author: Cathy
 
@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import plasticity_simulations_utils as utils
 
+# Simulations with averaged approximation.
 def run_average_simulation(num_inputs, num_timesteps, learning_rate, nonnegative_weights, update_function):
     initial_weight = np.abs(np.random.randn(num_inputs)) # Right, then left eye.
     all_weights = np.empty((num_inputs, num_timesteps + 1))
@@ -24,7 +25,7 @@ def run_average_simulation(num_inputs, num_timesteps, learning_rate, nonnegative
         all_weights[:, i + 1] = new_weight
     return all_weights
 
-def run_simulation_trajectory_average(update_function, update_name, nonnegative_weights=True):
+def run_simulation_trajectory_average(update_function, update_name, save_name, nonnegative_weights=True):
     num_timesteps = 100
     num_inputs = 2
     learning_rate = 1
@@ -38,9 +39,11 @@ def run_simulation_trajectory_average(update_function, update_name, nonnegative_
     plt.xlabel("Number of Timesteps")
     plt.ylabel("Weight")
     plt.legend()
-    plt.title("Ocular Dominance Weight Trajectories, Average %s Updates" % update_name)
+    plt.title("Ocular Dominance Weight Trajectories, Average %s Updates" % update_name, fontsize=8)
+    plt.savefig("../figures/trajectories_average_%s" % save_name)
+    plt.close()
 
-def run_simulation_many_trials_average(update_function, update_name, nonnegative_weights=True):
+def run_simulation_many_trials_average(update_function, update_name, save_name, nonnegative_weights=True):
     num_timesteps = 100
     num_inputs = 2
     learning_rate = 0.1
@@ -59,10 +62,15 @@ def run_simulation_many_trials_average(update_function, update_name, nonnegative
     plt.ylim([0, max(final_weights_right)])
     plt.xlabel("Final Weights, Left Eye")
     plt.ylabel("Final Weights, Right Eye")
-    plt.title("Ocular Dominance Final Weights, %s Updates" % update_name)
+    plt.title("Ocular Dominance Final Weights, %s Updates" % update_name, fontsize=8)
+    plt.savefig("../figures/trials_average_%s" % save_name)
+    plt.close()    
 
+# Simulations.
 def run_simulation(num_inputs, num_timesteps, learning_rate, nonnegative_weights, update_function):
-    initial_weight = np.abs(np.random.randn(num_inputs)) # Right, then left eye.
+    initial_weight = np.random.randn(num_inputs) # Right, then left eye.
+    if nonnegative_weights:
+        initial_weight = np.abs(initial_weight)
     all_weights = np.empty((num_inputs, num_timesteps + 1))
     all_weights[:,0] = initial_weight
     for i in range(num_timesteps):
@@ -77,7 +85,7 @@ def run_simulation(num_inputs, num_timesteps, learning_rate, nonnegative_weights
     return all_weights
 
 # Weight trajectory with specified updates for a single eye.
-def run_simulation_trajectory(update_function, update_name, nonnegative_weights=True):
+def run_simulation_trajectory(update_function, update_name, save_name, nonnegative_weights=True):
     num_timesteps = 100
     num_inputs = 2
     learning_rate = 1
@@ -91,10 +99,12 @@ def run_simulation_trajectory(update_function, update_name, nonnegative_weights=
     plt.xlabel("Number of Timesteps")
     plt.ylabel("Weight")
     plt.legend()
-    plt.title("Ocular Dominance Weight Trajectories, %s Updates" % update_name)
+    plt.title("Ocular Dominance Weight Trajectories, %s Updates" % update_name, fontsize=8)
+    plt.savefig("../figures/trajectories_%s" % save_name)
+    plt.close()
 
 # Final weights from multiple trials with specified updates.
-def run_simulation_many_trials(update_function, update_name, nonnegative_weights=True):
+def run_simulation_many_trials(update_function, update_name, save_name, nonnegative_weights=True):
     print(update_name)
     num_timesteps = 100
     num_inputs = 2
@@ -114,17 +124,22 @@ def run_simulation_many_trials(update_function, update_name, nonnegative_weights
     plt.ylim([0, max(final_weights_right)])
     plt.xlabel("Final Weights, Left Eye")
     plt.ylabel("Final Weights, Right Eye")
-    plt.title("Ocular Dominance Final Weights, %s Updates" % update_name)
+    plt.title("Ocular Dominance Final Weights, %s Updates" % update_name, fontsize=8)
+    plt.savefig("../figures/trials_%s" % save_name)
+    plt.close()
 
-# TODO: When to enforce nonnegative weights?
 if __name__ == "__main__":
-    run_simulation_many_trials(utils.basic_hebb_update, "Basic Hebb")
-    run_simulation_many_trials(utils.subtractive_normalization_update, "Subtractive Normalization")
-    run_simulation_many_trials(utils.oja_update, "Oja", nonnegative_weights=False)
+    run_simulation_many_trials(utils.basic_hebb_update, "Basic Hebb", "basichebb")
+    run_simulation_many_trials(utils.subtractive_normalization_update, "Subtractive Normalization", "subtractivenormalization")
+    run_simulation_many_trials(utils.oja_update, "Oja", "oja", nonnegative_weights=False)
     
-    run_simulation_trajectory(utils.basic_hebb_update, "Basic Hebb")
-    run_simulation_trajectory(utils.subtractive_normalization_update, "Subtractive Normalization")
-    run_simulation_trajectory(utils.oja_update, "Oja", nonnegative_weights=False)
+    run_simulation_trajectory(utils.basic_hebb_update, "Basic Hebb", "basichebb")
+    run_simulation_trajectory(utils.subtractive_normalization_update, "Subtractive Normalization", "subtractivenormalization")
+    run_simulation_trajectory(utils.oja_update, "Oja", "oja", nonnegative_weights=False)
     
-    run_simulation_trajectory_average(utils.basic_hebb_averaged_update, "Basic Hebb")
-    run_simulation_many_trials_average(utils.basic_hebb_averaged_update, "Basic Hebb")
+    run_simulation_trajectory_average(utils.basic_hebb_averaged_update, "Basic Hebb", "basichebb")
+    run_simulation_many_trials_average(utils.basic_hebb_averaged_update, "Basic Hebb", "basichebb")
+    
+    run_simulation_many_trials(utils.basic_hebb_update, "Basic Hebb", "basichebb_allowneg", nonnegative_weights=False)
+    run_simulation_trajectory(utils.basic_hebb_update, "Basic Hebb", "basichebb_allowneg", nonnegative_weights=False)
+
